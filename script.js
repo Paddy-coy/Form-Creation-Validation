@@ -2,16 +2,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("registration-form");
     const feedbackDiv = document.getElementById("form-feedback");
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", function (event) {
         event.preventDefault(); // Prevent form submission
 
-        // Retrieve user inputs
         const username = document.getElementById("username").value.trim();
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value.trim();
 
-        let isValid = true; // Validation status
-        const messages = []; // Array to hold error messages
+        let isValid = true;
+        const messages = []; // Store error messages
 
         // Username validation
         if (username.length < 3) {
@@ -37,8 +36,38 @@ document.addEventListener("DOMContentLoaded", () => {
             feedbackDiv.textContent = "Registration successful!";
             feedbackDiv.style.color = "#28a745"; // Green for success
         } else {
-            feedbackDiv.innerHTML = messages.join("<br>"); // Display error messages
+            feedbackDiv.innerHTML = messages.join("<br>"); // Show error messages
             feedbackDiv.style.color = "#dc3545"; // Red for error
         }
     });
+
+    // Fetching user data from API
+    async function fetchUserData() {
+        const apiUrl = 'https://jsonplaceholder.typicode.com/users';
+        const dataContainer = document.getElementById('api-data');
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+
+            const users = await response.json();
+            dataContainer.innerHTML = ''; // Clear loading message
+
+            const userList = document.createElement('ul');
+            users.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.textContent = user.name;
+                userList.appendChild(listItem);
+            });
+
+            dataContainer.appendChild(userList);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            dataContainer.innerHTML = 'Failed to load user data.';
+        }
+    }
+
+    fetchUserData(); // Call the function on load
 });
